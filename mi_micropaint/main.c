@@ -11,7 +11,7 @@ typedef struct s_background
 
 typedef struct s_form
 {
-    char        type;
+    char        type_r;
     float       x;
     float       y;
     float       width;
@@ -89,22 +89,21 @@ void            focus_area()
 
 }
 
-void            save_forms(FILE *file, char **screen)
+void            save_forms(FILE *file, char **screen, t_form *forma)
 {
     int         ret;
-	t_form 		forma;
 
-    if ((ret = fscanf(file, "%c %f %f %f %f %c", &forma.type, &forma.x, &forma.y, &forma.width, &forma.height, &forma.pencil)) != 6)
+    if ((ret = fscanf(file, "%c %f %f %f %f %c", &forma->type_r, &forma->x, &forma->y, &forma->width, &forma->height, &forma->pencil)) != 6)
     {
-		printf("\n\n|%c-%c-%f|\n\n", forma.type, forma.pencil, forma.x);
+		printf("\n|%c-%f-%f-%f-%f-%c|\n", forma->type_r, forma->x, forma->y, forma->width, forma->height, forma->pencil);
         printerror("Un error al leer del archivo\n");
 		exit(0);
     }
 	printf("Ret es: |%d|\n\n", ret);
-	printf("\n\n|%c-%c|\n\n", forma.type, forma.pencil);
-    if (forma.type == 'r')
+	printf("\n|%c-%f-%f-%f-%f-%c|\n", forma->type_r, forma->x, forma->y, forma->width, forma->height, forma->pencil);
+    if (forma->type_r == 'r')
         focus_perimetro();
-    else if (forma.type == 'R')
+    else if (forma->type_r == 'R')
         focus_area();
     else
     {
@@ -116,15 +115,22 @@ int             main(int argc, char **argv)
 {
     FILE        *file;
     t_backgound bg;
+	t_form		forma;
     char        **screen;
     int         i, j;
 
     if (argc != 2)
+	{
         printerror("Error: Argument\n");
+		return(0);
+	}
     if (!(file = fopen(argv[1], "r")))
         printerror("Error: File Corrupted\n");
-    if (!get_backgound(file, &bg))
+    if (get_backgound(file, &bg) == 0)
+	{
         printerror("Error: File Corrupted\n");
+		return (0);
+	}
     printf("aqui hay un with de %d, y height de %d\n", bg.width, bg.height);
     screen = (char **)malloc(sizeof(char *) * bg.height + 1);
 	i = 0;
@@ -141,7 +147,7 @@ int             main(int argc, char **argv)
        i++;
     }
 	screen[i] = 0;
-    save_forms(file, screen);
+    save_forms(file, screen, &forma);
     /*AQUI FALTA DE METER UN BUCLE CON SCANF PARA CUALQUIER NUM DE FIGURAS*/
     paint_piece(screen);
     double_kill(screen);
