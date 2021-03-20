@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct s_background
 {
@@ -39,7 +40,7 @@ int             get_backgound(FILE *file, t_backgound *bg)
 { //Sacamos el width y height del backgound y lo validamos
     int         ret;
 
-    if ((ret = fscanf(file, "%d %d %c", &bg->width, &bg->height, &bg->typr_bg) != 3))
+    if ((ret = fscanf(file, "%d %d %c\n", &bg->width, &bg->height, &bg->typr_bg) != 3))
         return (0);
     if (bg->width < 1 || bg->width > 300 || bg->height < 1|| bg->height > 300) 
         return (0);
@@ -93,13 +94,14 @@ void            save_forms(FILE *file, char **screen, t_form *forma)
 {
     int         ret;
 
-    if ((ret = fscanf(file, "%c %f %f %f %f %c", &forma->type_r, &forma->x, &forma->y, &forma->width, &forma->height, &forma->pencil)) != 6)
+    while ((ret = fscanf(file, "%c %f %f %f %f %c\n", &forma->type_r, &forma->x, &forma->y, &forma->width, &forma->height, &forma->pencil)) == 6)
     {
+		/**/
+		printf("Ret es: |%d|\n", ret);
 		printf("\n|%c-%f-%f-%f-%f-%c|\n", forma->type_r, forma->x, forma->y, forma->width, forma->height, forma->pencil);
         printerror("Un error al leer del archivo\n");
 		exit(0);
     }
-	printf("Ret es: |%d|\n\n", ret);
 	printf("\n|%c-%f-%f-%f-%f-%c|\n", forma->type_r, forma->x, forma->y, forma->width, forma->height, forma->pencil);
     if (forma->type_r == 'r')
         focus_perimetro();
