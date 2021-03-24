@@ -2,6 +2,11 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+
+#define ANSI_COLOR_RED      "\x1b[31m"
+#define ANSI_COLOR_GREEN    "\x1b[32m"
+#define ANSI_COLOR_RESET    "\x1b[0m"
 
 typedef struct s_background
 {
@@ -80,14 +85,47 @@ void            double_kill(char **str)
     free(str);
 }
 
-void            focus_perimetro()
+int            check_negative(t_form *forma)
 {
-
+    if (forma->x < 0)
+    {
+        forma->width -= fabs(forma->x);
+        forma->x = 0;
+    }
+    if (forma->y < 0)
+    {
+        forma->height -= fabs(forma->y);
+        forma->y = 0;
+    }
+    if (forma->height < 0 || forma->width < 0)
+        return (-1); //si llega a este if, no deberia pintar ya que el cuadrado se sale del lienzo
+    else
+        return(0);
 }
 
-void            focus_area()
+void            focus_perimetro(char **screen, t_form *forma)
 {
+    float       i;
+    float       j;
 
+    i = forma->x;
+    j = forma->y;
+    if (check_negative(forma) == 0)
+        printf(ANSI_COLOR_GREEN "PINTABLE" ANSI_COLOR_RESET "\n");
+    else if (check_negative(forma) == -1)
+        printf(ANSI_COLOR_RED "NO PINTABLE" ANSI_COLOR_RESET "\n");
+    else
+        printf("** Error al calcular si es pintable **\n");
+}
+
+void            focus_area(char **screen, t_form *forma)
+{
+    if (check_negative(forma) == 0)
+        printf(ANSI_COLOR_GREEN "PINTABLE" ANSI_COLOR_RESET "\n");
+    else if (check_negative(forma) == -1)
+        printf(ANSI_COLOR_RED "NO PINTABLE" ANSI_COLOR_RESET "\n");
+    else
+        printf("** Error al calcular si es pintable **\n");
 }
 
 void            save_forms(FILE *file, char **screen, t_form *forma)
@@ -96,21 +134,19 @@ void            save_forms(FILE *file, char **screen, t_form *forma)
 
     while ((ret = fscanf(file, "%c %f %f %f %f %c\n", &forma->type_r, &forma->x, &forma->y, &forma->width, &forma->height, &forma->pencil)) == 6)
     {
-		/**/
-		printf("Ret es: |%d|\n", ret);
+		printf("Ret es: |%d|", ret);
 		printf("\n|%c-%f-%f-%f-%f-%c|\n", forma->type_r, forma->x, forma->y, forma->width, forma->height, forma->pencil);
-        printerror("Un error al leer del archivo\n");
-		exit(0);
+        if (forma->type_r == 'r')
+            focus_perimetro(screen, forma);
+        else if (forma->type_r == 'R')
+            focus_area(screen, forma);
+        else
+        {
+            printerror("Un error ya que el primer caractwr no es ni r ni R\n");
+            exit (0);
+        }
     }
-	printf("\n|%c-%f-%f-%f-%f-%c|\n", forma->type_r, forma->x, forma->y, forma->width, forma->height, forma->pencil);
-    if (forma->type_r == 'r')
-        focus_perimetro();
-    else if (forma->type_r == 'R')
-        focus_area();
-    else
-    {
-        printerror("Un error ya que el primer caractwr no es ni r ni R\n");
-    }
+
 }
 
 int             main(int argc, char **argv)
