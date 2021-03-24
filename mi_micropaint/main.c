@@ -103,7 +103,12 @@ int            check_negative(t_form *forma)
         return(0);
 }
 
-void            focus_perimetro(char **screen, t_form *forma)
+void            print_me_p(char **screen, t_form *forma, t_backgound *bg)
+{
+
+}
+
+void            focus_perimetro(char **screen, t_form *forma, t_backgound *bg)
 {
     float       i;
     float       j;
@@ -111,24 +116,54 @@ void            focus_perimetro(char **screen, t_form *forma)
     i = forma->x;
     j = forma->y;
     if (check_negative(forma) == 0)
+    {
         printf(ANSI_COLOR_GREEN "PINTABLE" ANSI_COLOR_RESET "\n");
+        print_me_p(screen, forma, bg);
+    }
     else if (check_negative(forma) == -1)
         printf(ANSI_COLOR_RED "NO PINTABLE" ANSI_COLOR_RESET "\n");
     else
         printf("** Error al calcular si es pintable **\n");
 }
 
-void            focus_area(char **screen, t_form *forma)
+void            print_me_a(char **screen, t_form *forma, t_backgound *bg)
 {
+    int         i;
+    int         j;
+
+    printf("|  | %f, %f, %f, %f\n", forma->x, forma->y, forma->width, forma->height);
+    i = 0;
+    while (i < (int)forma->height)
+    {
+        j = 0;
+        while (j < (int)forma->width)
+        {
+            printf("i : %d \n", i);
+            printf("j : %d \n", j);
+            if (((i+(int)forma->y) < bg->height) && ((j+(int)forma->x) < bg->width))
+                screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
+            j++;
+        }
+        i++;
+    }
+}
+
+void            focus_area(char **screen, t_form *forma, t_backgound *bg)
+{
+    printf("| %d | %f, %f, %f, %f\n", check_negative(forma), forma->x, forma->y, forma->width, forma->height);
     if (check_negative(forma) == 0)
+    {
         printf(ANSI_COLOR_GREEN "PINTABLE" ANSI_COLOR_RESET "\n");
+        print_me_a(screen, forma, bg);
+    }
     else if (check_negative(forma) == -1)
         printf(ANSI_COLOR_RED "NO PINTABLE" ANSI_COLOR_RESET "\n");
     else
         printf("** Error al calcular si es pintable **\n");
 }
 
-void            save_forms(FILE *file, char **screen, t_form *forma)
+
+void            save_forms(FILE *file, char **screen, t_form *forma, t_backgound *bg)
 {
     int         ret;
 
@@ -137,16 +172,21 @@ void            save_forms(FILE *file, char **screen, t_form *forma)
 		printf("Ret es: |%d|", ret);
 		printf("\n|%c-%f-%f-%f-%f-%c|\n", forma->type_r, forma->x, forma->y, forma->width, forma->height, forma->pencil);
         if (forma->type_r == 'r')
-            focus_perimetro(screen, forma);
+            focus_perimetro(screen, forma, bg);
         else if (forma->type_r == 'R')
-            focus_area(screen, forma);
+            focus_area(screen, forma, bg);
         else
         {
             printerror("Un error ya que el primer caractwr no es ni r ni R\n");
             exit (0);
         }
     }
-
+    if (ret != 6 && ret != -1) //si no da -1 que es que ya no hay na o 6 que son mas valores, error.
+    {
+        printf("ERROR: Hay algo mal escrito en el archivo\n");
+        exit (0);
+    }
+    printf("Ret es: |%d|", ret);
 }
 
 int             main(int argc, char **argv)
@@ -185,8 +225,7 @@ int             main(int argc, char **argv)
        i++;
     }
 	screen[i] = 0;
-    save_forms(file, screen, &forma);
-    /*AQUI FALTA DE METER UN BUCLE CON SCANF PARA CUALQUIER NUM DE FIGURAS*/
+    save_forms(file, screen, &forma, &bg);
     paint_piece(screen);
     double_kill(screen);
     return (0);
