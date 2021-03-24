@@ -105,7 +105,34 @@ int            check_negative(t_form *forma)
 
 void            print_me_p(char **screen, t_form *forma, t_backgound *bg)
 {
+	int         i;
+    int         j;
 
+    i = 0;
+    while (i < (int)forma->height)
+    {
+        j = 0;
+        while (j < (int)forma->width)
+        {
+            if ((i+(int)forma->y < bg->height) && (i+(int)forma->y >= 0) &&
+			(j+(int)forma->x < bg->width) && (j+(int)forma->x) >= 0)
+			{
+                if ((i+forma->y == forma->y) && ((j + forma->x == forma->x) || j+forma->x <= forma->x+forma->width))
+					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
+				if ((j+forma->x == forma->x) && ((i + forma->y == forma->y) || (i+forma->y <= forma->y+forma->height)))
+					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
+				if ((i == forma->y+forma->height) && (((j + forma->x) >= (forma->x)) && ((j+forma->x) <= (forma->x+forma->width))))
+					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
+					//printf("aiudbf iuabfiuoabn\n");*/
+				/*if((i == forma->y+forma->height) && (j+forma->x) <= (forma->x + forma->width))
+					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;*/
+				if ((j+forma->x == forma->x+forma->width) && ((i + forma->y == forma->y) || (i+forma->y <= forma->y+forma->height)))
+					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
+			}	
+            j++;
+        }
+        i++;
+    }
 }
 
 void            focus_perimetro(char **screen, t_form *forma, t_backgound *bg)
@@ -131,15 +158,12 @@ void            print_me_a(char **screen, t_form *forma, t_backgound *bg)
     int         i;
     int         j;
 
-    printf("|  | %f, %f, %f, %f\n", forma->x, forma->y, forma->width, forma->height);
     i = 0;
     while (i < (int)forma->height)
     {
         j = 0;
         while (j < (int)forma->width)
         {
-            printf("i : %d \n", i);
-            printf("j : %d \n", j);
             if (((i+(int)forma->y) < bg->height) && ((j+(int)forma->x) < bg->width))
                 screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
             j++;
@@ -150,7 +174,6 @@ void            print_me_a(char **screen, t_form *forma, t_backgound *bg)
 
 void            focus_area(char **screen, t_form *forma, t_backgound *bg)
 {
-    printf("| %d | %f, %f, %f, %f\n", check_negative(forma), forma->x, forma->y, forma->width, forma->height);
     if (check_negative(forma) == 0)
     {
         printf(ANSI_COLOR_GREEN "PINTABLE" ANSI_COLOR_RESET "\n");
@@ -169,9 +192,7 @@ void            save_forms(FILE *file, char **screen, t_form *forma, t_backgound
 
     while ((ret = fscanf(file, "%c %f %f %f %f %c\n", &forma->type_r, &forma->x, &forma->y, &forma->width, &forma->height, &forma->pencil)) == 6)
     {
-		printf("Ret es: |%d|", ret);
-		printf("\n|%c-%f-%f-%f-%f-%c|\n", forma->type_r, forma->x, forma->y, forma->width, forma->height, forma->pencil);
-        if (forma->type_r == 'r')
+		if (forma->type_r == 'r')
             focus_perimetro(screen, forma, bg);
         else if (forma->type_r == 'R')
             focus_area(screen, forma, bg);
@@ -209,7 +230,6 @@ int             main(int argc, char **argv)
         printerror("Error: File Corrupted\n");
 		return (0);
 	}
-    printf("aqui hay un with de %d, y height de %d\n", bg.width, bg.height);
     screen = (char **)malloc(sizeof(char *) * bg.height + 1);
 	i = 0;
     while(i < bg.height)
