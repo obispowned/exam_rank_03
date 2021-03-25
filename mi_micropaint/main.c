@@ -109,26 +109,23 @@ void            print_me_p(char **screen, t_form *forma, t_backgound *bg)
     int         j;
 
     i = 0;
-    while (i < (int)forma->height)
+    while (i <= (int)forma->height)
     {
         j = 0;
-        while (j < (int)forma->width)
+        while (j <= (int)forma->width)
         {
             if ((i+(int)forma->y < bg->height) && (i+(int)forma->y >= 0) &&
 			(j+(int)forma->x < bg->width) && (j+(int)forma->x) >= 0)
 			{
-                if ((i+forma->y == forma->y) && ((j + forma->x == forma->x) || j+forma->x <= forma->x+forma->width))
+                if ((i+forma->y == forma->y) && ((j+forma->x >= forma->x) && (j+forma->x <= forma->x+forma->width)))
 					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
-				if ((j+forma->x == forma->x) && ((i + forma->y == forma->y) || (i+forma->y <= forma->y+forma->height)))
+				if ((j+forma->x == forma->x) && ((i + forma->y >= forma->y) && (i+forma->y <= forma->y+forma->height)))
 					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
-				if ((i == forma->y+forma->height) && (((j + forma->x) >= (forma->x)) && ((j+forma->x) <= (forma->x+forma->width))))
+				if ((i == forma->height) && (((j + forma->x) >= (forma->x)) && ((j+forma->x) <= (forma->x+forma->width))))
 					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
-					//printf("aiudbf iuabfiuoabn\n");*/
-				/*if((i == forma->y+forma->height) && (j+forma->x) <= (forma->x + forma->width))
-					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;*/
 				if ((j+forma->x == forma->x+forma->width) && ((i + forma->y == forma->y) || (i+forma->y <= forma->y+forma->height)))
 					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
-			}	
+			}
             j++;
         }
         i++;
