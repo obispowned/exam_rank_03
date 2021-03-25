@@ -102,7 +102,7 @@ int            check_negative(t_form *forma)
     else
         return(0);
 }
-
+/*
 void            print_me_p(char **screen, t_form *forma, t_backgound *bg)
 {
 	int         i;
@@ -131,23 +131,33 @@ void            print_me_p(char **screen, t_form *forma, t_backgound *bg)
         i++;
     }
 }
-
-void            focus_perimetro(char **screen, t_form *forma, t_backgound *bg)
+*/
+void            print_me_p(char **screen, t_form *forma, t_backgound *bg)
 {
-    float       i;
-    float       j;
+	int         i ,j;
 
-    i = forma->x;
-    j = forma->y;
-    if (check_negative(forma) == 0)
+    i = 0;
+    while (i <= bg->height)
     {
-        printf(ANSI_COLOR_GREEN "PINTABLE" ANSI_COLOR_RESET "\n");
-        print_me_p(screen, forma, bg);
+        j = 0;
+        while (j <= bg->width)
+        {
+            if ((i+(int)forma->y < bg->height) && (i+(int)forma->y >= 0) &&
+			(j+(int)forma->x < bg->width) && (j+(int)forma->x) >= 0)
+			{
+                if ((i+forma->y == forma->y) && ((j+forma->x >= forma->x) && (j+forma->x <= forma->x+forma->width)))
+					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
+				if ((j+forma->x == forma->x) && ((i + forma->y >= forma->y) && (i+forma->y <= forma->y+forma->height)))
+					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
+				if ((i == forma->height) && (((j + forma->x) >= (forma->x)) && ((j+forma->x) <= (forma->x+forma->width))))
+					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
+				if ((j+forma->x == forma->x+forma->width) && ((i + forma->y == forma->y) || (i+forma->y <= forma->y+forma->height)))
+					screen[i+(int)forma->y][j+(int)forma->x] = forma->pencil;
+			}
+            j++;
+        }
+        i++;
     }
-    else if (check_negative(forma) == -1)
-        printf(ANSI_COLOR_RED "NO PINTABLE" ANSI_COLOR_RESET "\n");
-    else
-        printf("** Error al calcular si es pintable **\n");
 }
 
 void            print_me_a(char **screen, t_form *forma, t_backgound *bg)
@@ -190,7 +200,7 @@ void            save_forms(FILE *file, char **screen, t_form *forma, t_backgound
     while ((ret = fscanf(file, "%c %f %f %f %f %c\n", &forma->type_r, &forma->x, &forma->y, &forma->width, &forma->height, &forma->pencil)) == 6)
     {
 		if (forma->type_r == 'r')
-            focus_perimetro(screen, forma, bg);
+            print_me_p(screen, forma, bg);
         else if (forma->type_r == 'R')
             focus_area(screen, forma, bg);
         else
